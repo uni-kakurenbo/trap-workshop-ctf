@@ -1,31 +1,66 @@
 from random import randrange
 from Crypto.Util.number import isPrime, bytes_to_long
-from math import gcd
-
+from math import gcd, isqrt
+import numpy as np
 p, q = 0, 0
 
 
+
+
+M = np.array([
+    [
+        26863810024485359386146727202142923967616609318986952340123175997617981700247881689338369654483356564191827856161443356312976673642210350324634850410377680367334151172899169723197082763985615764450078474174626,
+        43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875
+    ],
+    [
+        43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875,
+        70330367711422815821835254877183549770181269836358732742604905087154537118196933579742249494562611733487750449241765991088186363265450223647106012053374121273867339111198139373125598767690091902245245323403501
+    ]
+])
+
+alpha = M[0, 0]
+beta = M[0, 1]
+gamma = M[1, 1]
+
+A = alpha * beta
+B = alpha * gamma + beta ** 2
+C = beta * gamma
+
+print(f"{ A = }", f"{ B = }", f"{ C = }")
+gcdAB = gcd(A, B)
+print(f"{ gcdAB = }")
+
+# exit(0)
+
 def far_far_away(a, b):
     for i in range(1000):
-        a, b = b, a + b
+        a, b = b, a+b
     return a, b
-
 
 while 1:
     a, b = randrange(0, 2**32), randrange(0, 2**32)
     p, q = far_far_away(a, b)
+    # p = alpha * a + beta * b
+    # q = beta * a + gamma * b
     if isPrime(p) and isPrime(q):
         break
 
-print(a, b, p, q)
+print(a, b)
+print(p, q)
 
 e = 0x10001
-N = p * q
+N = p*q
+
+rt = isqrt(N)
+print(rt)
+print(rt - p, rt - q)
+
 print(f"{e = }")
 print(f"{N = }")
 
-with open("flag.txt") as f:
-    flag = bytes_to_long(f.read().encode())
+flag = bytes_to_long(b"dummy")
+# with open("flag.txt") as f:
+    # flag = bytes_to_long(f.read().encode())
 
 cipher = pow(flag, e, N)
 print(f"{cipher = }")
